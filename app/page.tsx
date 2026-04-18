@@ -2,72 +2,62 @@
 
 import { useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { ScrollControls, Scroll, useScroll } from '@react-three/drei';
+import { ScrollControls, Scroll, useScroll, Float, MeshDistortMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import { Space_Grotesk, Playfair_Display } from 'next/font/google';
 
-const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['300', '400', '600', '700'] });
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['300', '400', '700'] });
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['600', '700'] });
 
-// --- ÇEVİRİ SÖZLÜĞÜ (Aynen Korundu) ---
+// --- ÇEVİRİ VE VERİ MERKEZİ ---
 const translations = {
   en: {
+    hero: "EMRE DÖNMEZ",
     heroPrefix: "I am a",
     typewriterWords: ["Software Engineer", "Full-Stack Developer", "AI Specialist"],
     about: "Passionate about building scalable systems and integrating AI into real-world applications. I believe in clean code, robust architecture, and technology that makes a tangible impact.",
-    appTag: "01 — Mobile Application",
-    appDesc: "A location-based mobile tracking application built with React Native. Features include real-time location calculations and a custom notification system.",
-    btnSource: "View Source Code",
-    aiTag: "02 — AI & Computer Vision",
-    aiDesc: "A TÜBİTAK 2209-B supported driver drowsiness tracking system. Integrates facial expression recognition models across Web and Mobile platforms (Developed with Mustafa Aslan).",
-    btnGithub: "Explore on GitHub",
-    nextierTag: "03 — Artificial Intelligence",
-    nextierDesc: "A high-performance WinUI 3 desktop application featuring Local LLM integration via Ollama, providing a private and cost-effective AI experience.",
-    btnProject: "View Project",
-    careerTag: "04 — Career",
-    careerTitle: "Experience",
-    jobTitle: "Software Developer",
-    jobDate: "Present (İŞKUR Youth Program)",
-    jobDesc: "Actively contributing to the university's IT infrastructure. Responsibilities include frontend development, UI/UX optimization, and database management.",
-    arsenalTag: "05 — Arsenal",
-    techTitle: "Tech Stack",
-    contactTag: "06 — Contact",
-    contactTitle: "Let's Build Something\nAmazing Together.",
-    contactDesc: "I'm currently looking for new opportunities. Whether you have a question, a project idea, or just want to say hi, I'll try my best to get back to you!",
+    projects: [
+      { name: "Yoldaş", tag: "MOBILE AI", desc: "Location-based intelligence for modern life.", link: "https://github.com/Emrefire/Yoldas-App" },
+      { name: "ODAK", tag: "COMPUTER VISION", desc: "TÜBİTAK 2209-B: Saving lives with facial recognition.", link: "https://github.com/Emrefire/ODAK-Driver-Drowsiness-Tracking" },
+      { name: "NexTierAI", tag: "LLM & RAG", desc: "Your private local AI infrastructure.", link: "https://github.com/Emrefire/NextierAI" }
+    ],
+    experience: {
+      title: "Experience",
+      job: "Software Developer",
+      date: "Present (İŞKUR Youth Program)",
+      desc: "Actively contributing to the university's IT infrastructure, UI/UX optimization, and database management."
+    },
+    arsenal: "Tech Stack",
+    contact: "START A PROJECT",
     btnEmail: "Say Hello",
-    btnCv: "Download Resume",
-    rights: "Emre Dönmez. All Rights Reserved."
+    btnCv: "Download CV",
+    rights: "ALL RIGHTS RESERVED"
   },
   tr: {
+    hero: "EMRE DÖNMEZ",
     heroPrefix: "Ben bir",
     typewriterWords: ["Yazılım Mühendisi", "Full-Stack Geliştirici", "Yapay Zeka Uzmanı"],
-    about: "Ölçeklenebilir sistemler kurma ve yapay zekayı gerçek dünya uygulamalarına entegre etme konusunda tutkuluyum. Temiz koda, sağlam mimariye ve somut etki yaratan teknolojiye inanıyorum.",
-    appTag: "01 — Mobil Uygulama",
-    appDesc: "React Native ile geliştirilmiş, lokasyon bazlı anlık takip ve özel bildirim sistemine sahip canlı mobil uygulama.",
-    btnSource: "Kaynak Kodu İncele",
-    aiTag: "02 — Yapay Zeka & Görüntü İşleme",
-    aiDesc: "TÜBİTAK 2209-B destekli sürücü yorgunluk takip sistemi. Yüz ifadesi tanıma modellerinin Web ve Mobil platformlara entegrasyonu (Mustafa Aslan ile birlikte).",
-    btnGithub: "GitHub'da İncele",
-    nextierTag: "03 — Yapay Zeka",
-    nextierDesc: "Ollama üzerinden Yerel LLM entegrasyonuna sahip, veri gizliliği odaklı ve yüksek performanslı WinUI 3 masaüstü yapay zeka çözümü.",
-    btnProject: "Projeye Git",
-    careerTag: "04 — Kariyer",
-    careerTitle: "Deneyim",
-    jobTitle: "Yazılım Geliştirici",
-    jobDate: "Güncel (İŞKUR Gençlik Programı)",
-    jobDesc: "Üniversitenin bilgi işlem departmanında aktif olarak görev alıyorum. Ağırlıklı olarak frontend geliştirme, arayüz optimizasyonları ve veritabanı yönetimi süreçlerini yürütmekteyim.",
-    arsenalTag: "05 — Cephanelik",
-    techTitle: "Teknolojiler",
-    contactTag: "06 — İletişim",
-    contactTitle: "Hadi Birlikte\nHarika Şeyler Yapalım.",
-    contactDesc: "Yeni fırsatlara ve projelere her zaman açığım. İster bir proje fikrin olsun, ister takımına dahil etmek iste, mesaj atman yeterli!",
-    btnEmail: "Bana E-posta Gönder",
+    about: "Ölçeklenebilir sistemler kurma ve yapay zekayı gerçek dünya uygulamalarına entegre etme konusunda tutkuluyum. Temiz koda ve sağlam mimariye inanıyorum.",
+    projects: [
+      { name: "Yoldaş", tag: "MOBİL YZ", desc: "Modern yaşam için lokasyon bazlı zeka.", link: "https://github.com/Emrefire/Yoldas-App" },
+      { name: "ODAK", tag: "GÖRÜNTÜ İŞLEME", desc: "TÜBİTAK 2209-B: Yüz tanıma ile hayat kurtaran sistem.", link: "https://github.com/Emrefire/ODAK-Driver-Drowsiness-Tracking" },
+      { name: "NexTierAI", tag: "LLM & RAG", desc: "Kişisel yerel yapay zeka altyapınız.", link: "https://github.com/Emrefire/NextierAI" }
+    ],
+    experience: {
+      title: "Deneyim",
+      job: "Yazılım Geliştirici",
+      date: "Güncel (İŞKUR Gençlik Programı)",
+      desc: "Üniversitenin bilgi işlem departmanında aktif olarak görev alıyorum. Arayüz optimizasyonları ve veritabanı yönetimi süreçlerini yürütmekteyim."
+    },
+    arsenal: "Cephanelik",
+    contact: "PROJE BAŞLAT",
+    btnEmail: "Merhaba De",
     btnCv: "CV İndir",
-    rights: "Emre Dönmez. Tüm Hakları Saklıdır."
+    rights: "TÜM HAKLARI SAKLIDIR"
   }
 };
 
-// --- Daktilo Efekti (Aynen Korundu) ---
+// --- DAKTİLO EFEKTİ ---
 function Typewriter({ words }: { words: string[] }) {
   const [index, setIndex] = useState(0);
   const [text, setText] = useState('');
@@ -75,36 +65,11 @@ function Typewriter({ words }: { words: string[] }) {
   const colorRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    setText('');
-    setIndex(0);
-    setIsDeleting(false);
-  }, [words]);
-
-  useEffect(() => {
-    let animationFrameId: number;
-    const startTime = Date.now();
-    const updateColor = () => {
-      if (colorRef.current) {
-        const elapsed = (Date.now() - startTime) / 1000;
-        const hue = (elapsed * 36) % 360; 
-        colorRef.current.style.color = `hsl(${hue}, 100%, 50%)`;
-      }
-      animationFrameId = requestAnimationFrame(updateColor);
-    };
-    updateColor();
-    return () => cancelAnimationFrame(animationFrameId);
-  }, []);
-
-  useEffect(() => {
-    const currentWord = words[index];
-    if (!currentWord) return;
-
-    const timeout = setTimeout(() => {
+    let timeout = setTimeout(() => {
+      const currentWord = words[index];
       if (!isDeleting) {
         setText(currentWord.substring(0, text.length + 1));
-        if (text === currentWord) {
-          setTimeout(() => setIsDeleting(true), 1500); 
-        }
+        if (text === currentWord) setTimeout(() => setIsDeleting(true), 1500);
       } else {
         setText(currentWord.substring(0, text.length - 1));
         if (text === '') {
@@ -113,233 +78,197 @@ function Typewriter({ words }: { words: string[] }) {
         }
       }
     }, isDeleting ? 50 : 100);
-
     return () => clearTimeout(timeout);
   }, [text, isDeleting, index, words]);
 
-  return (
-    <span ref={colorRef} style={{ color: '#00f3ff', transition: 'color 0.1s linear' }}>
-      {text}
-      <span className="animate-pulse font-bold text-white">|</span>
-    </span>
-  );
+  useEffect(() => {
+    let frameId: number;
+    const update = () => {
+      if (colorRef.current) {
+        const hue = (Date.now() / 50) % 360;
+        colorRef.current.style.color = `hsl(${hue}, 100%, 60%)`;
+      }
+      frameId = requestAnimationFrame(update);
+    };
+    update();
+    return () => cancelAnimationFrame(frameId);
+  }, []);
+
+  return <span ref={colorRef} className="font-bold border-r-2 border-white pr-1 transition-all">{text}</span>;
 }
 
-// --- 3D Obje ---
-function ColorChangingKnot() {
+// --- MORPHING 3D OBJESI ---
+function MorphingScene() {
   const meshRef = useRef<THREE.Mesh>(null);
-  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
   const scroll = useScroll();
 
-  useFrame((state, delta) => {
+  useFrame((state) => {
     if (!meshRef.current) return;
-    meshRef.current.rotation.x += delta * 0.2;
-    meshRef.current.rotation.y += delta * 0.3;
     const offset = scroll.offset;
-    meshRef.current.position.y = -offset * 25; 
-    meshRef.current.rotation.z = offset * Math.PI * 3; 
-
-    if (materialRef.current) {
-      const hue = (state.clock.elapsedTime * 0.1) % 1; 
-      materialRef.current.color.setHSL(hue, 1, 0.5);
+    meshRef.current.rotation.x += 0.01;
+    meshRef.current.rotation.y += 0.005 + (offset * 0.05);
+    meshRef.current.position.x = Math.sin(offset * Math.PI * 2) * 3;
+    meshRef.current.scale.setScalar(1.2 + Math.sin(offset * Math.PI) * 0.4);
+    
+    if (meshRef.current.material instanceof THREE.MeshStandardMaterial || meshRef.current.material instanceof THREE.MeshPhysicalMaterial) {
+      const hue = (state.clock.elapsedTime * 0.05 + offset) % 1;
+      meshRef.current.material.color.setHSL(hue, 0.7, 0.5);
     }
   });
 
   return (
-    <mesh ref={meshRef} position={[3, 0, -2]}>
-      <torusKnotGeometry args={[1.5, 0.4, 128, 32]} />
-      <meshStandardMaterial 
-        ref={materialRef}
-        wireframe={true} 
-        transparent={true}
-        opacity={0.6}
-        color="#00f3ff" 
-      />
-    </mesh>
+    <Float speed={2} rotationIntensity={2} floatIntensity={2}>
+      <mesh ref={meshRef}>
+        <torusKnotGeometry args={[2.5, 0.5, 256, 64]} />
+        <MeshDistortMaterial speed={3} distort={0.5} radius={1} wireframe />
+      </mesh>
+    </Float>
   );
 }
 
-export default function Portfolio() {
-  const [lang, setLang] = useState<'en' | 'tr'>('en');
-  const t = translations[lang];
+// --- PARLAYAN PROJE BİLEŞENİ ---
+function GlowingProject({ project, index, total }: { project: any, index: number, total: number }) {
+  const scroll = useScroll();
+  const [active, setActive] = useState(false);
+  const start = index / total;
+  const end = (index + 0.8) / total;
 
-  // --- HATA ÇÖZÜCÜ: HYDRATION KONTROLÜ ---
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) return null; 
+  useFrame(() => {
+    const offset = scroll.offset;
+    setActive(offset > start - 0.05 && offset < end);
+  });
 
   return (
-    <div className={`h-screen w-full bg-[#050505] text-white overflow-hidden ${spaceGrotesk.className}`}>
+    <div className={`h-screen flex flex-col items-center justify-center transition-all duration-1000 transform ${active ? 'scale-110 opacity-100 blur-0' : 'scale-75 opacity-10 blur-md'}`}>
+      <span className="text-[#00f3ff] font-bold tracking-[0.5em] mb-4 drop-shadow-[0_0_15px_#00f3ff]">{project.tag}</span>
+      <h2 className={`text-6xl md:text-[10vw] font-black text-center transition-all duration-500 ${active ? 'text-white drop-shadow-[0_0_40px_rgba(255,255,255,0.7)]' : 'text-gray-900'}`}>
+        {project.name}
+      </h2>
+      <p className="max-w-lg text-center text-gray-400 mt-6 text-xl font-light px-6">{project.desc}</p>
+      <a href={project.link} target="_blank" className={`mt-10 px-12 py-4 border-2 border-white rounded-full font-bold tracking-widest transition-all ${active ? 'bg-white text-black translate-y-0' : 'translate-y-20 opacity-0'}`}>
+        EXPLORE CODE
+      </a>
+    </div>
+  );
+}
+
+export default function HyperPortfolio() {
+  const [lang, setLang] = useState<'en' | 'tr'>('en');
+  const t = translations[lang];
+  const [mounted, setMounted] = useState(false);
+  const [mouse, setMouse] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    setMounted(true);
+    const handleMouse = (e: MouseEvent) => setMouse({ x: e.clientX, y: e.clientY });
+    window.addEventListener('mousemove', handleMouse);
+    return () => window.removeEventListener('mousemove', handleMouse);
+  }, []);
+
+  if (!mounted) return null;
+
+  return (
+    <div className={`h-screen w-full bg-[#020202] text-white overflow-hidden ${spaceGrotesk.className}`}>
       
-      <button 
-        onClick={() => setLang(lang === 'en' ? 'tr' : 'en')}
-        className="fixed top-6 right-6 md:top-10 md:right-10 z-50 px-4 py-2 border-2 border-[#00f3ff] text-[#00f3ff] hover:bg-[#00f3ff] hover:text-black transition-all duration-300 rounded-full font-bold tracking-widest text-sm shadow-[0_0_15px_rgba(0,243,255,0.3)] hover:shadow-[0_0_30px_rgba(0,243,255,0.8)] backdrop-blur-sm bg-black/30"
-      >
-        {lang === 'en' ? 'TR' : 'EN'}
-      </button>
+      {/* CUSTOM MOUSE TRAIL */}
+      <div 
+        className="fixed w-8 h-8 border border-[#00f3ff] rounded-full pointer-events-none z-[100] transition-transform duration-100 mix-blend-difference hidden md:block"
+        style={{ left: mouse.x, top: mouse.y, transform: `translate(-50%, -50%)` }}
+      />
 
-      <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 10]} intensity={1.5} />
+      <nav className="fixed top-0 w-full p-8 flex justify-between items-center z-50 mix-blend-difference">
+        <div className="font-bold tracking-tighter text-2xl">E.D</div>
+        <button onClick={() => setLang(lang === 'en' ? 'tr' : 'en')} className="px-6 py-2 border border-white/20 rounded-full hover:bg-white hover:text-black transition-all">
+          {lang === 'en' ? 'TR' : 'EN'}
+        </button>
+      </nav>
 
-        <ScrollControls pages={6} damping={0.1}>
-          <ColorChangingKnot />
+      <Canvas camera={{ position: [0, 0, 15], fov: 45 }}>
+        <fog attach="fog" args={['#020202', 12, 28]} />
+        <ambientLight intensity={0.1} />
+        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={2.5} color="#00f3ff" />
+        
+        <ScrollControls pages={6} damping={0.25}>
+          <MorphingScene />
           
           <Scroll html style={{ width: '100%' }}>
             
-            {/* Sayfa 1: Hero */}
-            <div className="h-screen flex flex-col items-center justify-center px-4 text-center">
-              <h1 className={`text-7xl md:text-8xl font-bold tracking-tight mb-2 ${playfair.className}`}>
-                Emre Dönmez
+            {/* 1. HERO & TYPEWRITER */}
+            <section className="h-screen flex flex-col items-center justify-center text-center px-4">
+              <h1 className={`text-[12vw] leading-none font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-700 ${playfair.className}`}>
+                {t.hero}
               </h1>
-              <p className="text-2xl md:text-3xl font-light tracking-wide h-10 mt-2 mb-8 flex items-center justify-center gap-2">
+              <div className="mt-6 text-2xl md:text-3xl font-light tracking-wide flex items-center gap-3">
                 {t.heroPrefix} <Typewriter words={t.typewriterWords} />
+              </div>
+              <p className="max-w-2xl mt-12 text-gray-500 leading-relaxed text-lg border-t border-white/10 pt-8 italic">
+                "{t.about}"
               </p>
-              
-              <div className="max-w-2xl mt-4">
-                <p className="text-gray-400 font-light text-lg leading-relaxed border-t border-gray-800 pt-6">
-                  {t.about}
-                </p>
-              </div>
-            </div>
+            </section>
 
-            {/* Sayfa 2: Yoldaş */}
-            <div className="h-screen flex items-center justify-start pl-10 md:pl-32">
-              <div className="max-w-lg">
-                <p className="text-sm text-[#00f3ff] uppercase tracking-widest mb-2 font-semibold">{t.appTag}</p>
-                <h2 className="text-5xl md:text-6xl font-bold mb-6">Yoldaş</h2>
-                <p className="text-lg text-gray-300 font-light mb-8">
-                  {t.appDesc}
-                </p>
-                <a href="https://github.com/Emrefire/Yoldas-App" target="_blank" rel="noopener noreferrer" 
-                   className="inline-block px-8 py-3 border border-[#00f3ff] text-[#00f3ff] hover:bg-[#00f3ff] hover:text-black transition-all duration-300 rounded-full font-medium tracking-wide shadow-[0_0_15px_rgba(0,243,255,0.3)] hover:shadow-[0_0_30px_rgba(0,243,255,0.8)]">
-                  {t.btnSource}
-                </a>
-              </div>
-            </div>
+            {/* 2-3-4. PROJECTS */}
+            {t.projects.map((proj, i) => (
+              <GlowingProject key={i} project={proj} index={i + 1} total={5.5} />
+            ))}
 
-            {/* Sayfa 3: ODAK */}
-            <div className="h-screen flex items-center justify-end pr-10 md:pr-32">
-              <div className="max-w-lg text-right">
-                <p className="text-sm text-[#00f3ff] uppercase tracking-widest mb-2 font-semibold">{t.aiTag}</p>
-                <h2 className="text-5xl md:text-6xl font-bold mb-6">ODAK</h2>
-                <p className="text-lg text-gray-300 font-light mb-8">
-                  {t.aiDesc}
-                </p>
-                <div className="flex justify-end">
-                  <a href="https://github.com/Emrefire/ODAK-Driver-Drowsiness-Tracking" target="_blank" rel="noopener noreferrer" 
-                     className="inline-block px-8 py-3 border border-[#00f3ff] text-[#00f3ff] hover:bg-[#00f3ff] hover:text-black transition-all duration-300 rounded-full font-medium tracking-wide shadow-[0_0_15px_rgba(0,243,255,0.3)] hover:shadow-[0_0_30px_rgba(0,243,255,0.8)]">
-                    {t.btnGithub}
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Sayfa 4: NextierAI */}
-            <div className="h-screen flex items-center justify-start pl-10 md:pl-32">
-              <div className="max-w-lg">
-                <p className="text-sm text-[#00f3ff] uppercase tracking-widest mb-2 font-semibold">{t.nextierTag}</p>
-                <h2 className="text-5xl md:text-6xl font-bold mb-6">NextierAI</h2>
-                <p className="text-lg text-gray-300 font-light mb-8">
-                  {t.nextierDesc}
-                </p>
-                <a href="https://github.com/Emrefire/NextierAI" target="_blank" rel="noopener noreferrer" 
-                   className="inline-block px-8 py-3 border border-[#00f3ff] text-[#00f3ff] hover:bg-[#00f3ff] hover:text-black transition-all duration-300 rounded-full font-medium tracking-wide shadow-[0_0_15px_rgba(0,243,255,0.3)] hover:shadow-[0_0_30px_rgba(0,243,255,0.8)]">
-                  {t.btnProject}
-                </a>
-              </div>
-            </div>
-
-            {/* Sayfa 5: Experience */}
-            <div className="h-screen flex items-center justify-center px-6 md:px-20">
-              <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-16">
-                <div>
-                  <p className="text-sm text-[#00f3ff] uppercase tracking-widest mb-2 font-semibold">{t.careerTag}</p>
-                  <h2 className="text-4xl md:text-5xl font-bold mb-8">{t.careerTitle}</h2>
-                  <div className="border-l-2 border-[#00f3ff]/30 pl-6 relative">
-                    <div className="absolute w-4 h-4 bg-[#050505] border-2 border-[#00f3ff] rounded-full -left-[9px] top-2 shadow-[0_0_10px_#00f3ff]"></div>
-                    <h3 className="text-2xl font-bold text-white">{t.jobTitle}</h3>
-                    <p className="text-[#00f3ff] font-medium mb-1 mt-1">EBYU IT Department</p>
-                    <p className="text-gray-500 font-medium text-xs mb-4 uppercase tracking-wider">{t.jobDate}</p>
-                    <p className="text-gray-300 font-light leading-relaxed">
-                      {t.jobDesc}
-                    </p>
+            {/* 5. EXPERIENCE & TECH */}
+            <section className="h-screen flex items-center justify-center px-6">
+               <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-20 backdrop-blur-md bg-white/5 p-8 md:p-12 rounded-3xl border border-white/10">
+                  <div>
+                    <h3 className="text-[#00f3ff] text-sm tracking-[0.5em] font-bold mb-4 uppercase">{t.experience.title}</h3>
+                    <h2 className="text-3xl md:text-5xl font-bold mb-2">{t.experience.job}</h2>
+                    <p className="text-gray-500 text-sm mb-6">{t.experience.date}</p>
+                    <p className="text-gray-300 leading-relaxed text-lg">{t.experience.desc}</p>
                   </div>
-                </div>
-
-                <div>
-                  <p className="text-sm text-[#00f3ff] uppercase tracking-widest mb-2 font-semibold">{t.arsenalTag}</p>
-                  <h2 className="text-4xl md:text-5xl font-bold mb-8">{t.techTitle}</h2>
-                  <div className="space-y-6">
-                    <div>
-                      <h4 className="text-gray-400 mb-3 uppercase tracking-wider text-xs font-semibold">Backend & Architecture</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {['.NET Core', 'ASP.NET MVC/API', 'Clean Architecture', 'CQRS', 'MediatR', 'JWT'].map(tech => (
-                          <span key={tech} className="px-4 py-1.5 text-sm border border-gray-700/50 rounded-full hover:border-[#00f3ff] hover:text-[#00f3ff] transition-all hover:shadow-[0_0_10px_rgba(0,243,255,0.2)] bg-gray-900/30">
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="text-gray-400 mb-3 uppercase tracking-wider text-xs font-semibold">Frontend & Mobile</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {['React', 'Next.js', 'React Native', 'Tailwind CSS'].map(tech => (
-                          <span key={tech} className="px-4 py-1.5 text-sm border border-gray-700/50 rounded-full hover:border-[#00f3ff] hover:text-[#00f3ff] transition-all hover:shadow-[0_0_10px_rgba(0,243,255,0.2)] bg-gray-900/30">
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="text-gray-400 mb-3 uppercase tracking-wider text-xs font-semibold">Database & AI</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {['SQL Server', 'Firebase', 'LLM', 'RAG', 'Computer Vision'].map(tech => (
-                          <span key={tech} className="px-4 py-1.5 text-sm border border-gray-700/50 rounded-full hover:border-[#00f3ff] hover:text-[#00f3ff] transition-all hover:shadow-[0_0_10px_rgba(0,243,255,0.2)] bg-gray-900/30">
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
+                  <div>
+                    <h3 className="text-[#00f3ff] text-sm tracking-[0.5em] font-bold mb-8 uppercase">{t.arsenal}</h3>
+                    <div className="flex flex-wrap gap-3">
+                      {['.NET Core', 'React Native', 'Kotlin', 'Clean Architecture', 'LLM', 'RAG', 'Computer Vision', 'SQL Server'].map(skill => (
+                        <span key={skill} className="px-4 py-2 border border-white/20 rounded-full text-sm hover:border-[#00f3ff] hover:text-[#00f3ff] transition-all bg-black/40">
+                          {skill}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
+               </div>
+            </section>
 
-            {/* Sayfa 6: Contact */}
-            <div className="h-screen flex flex-col items-center justify-center relative">
-              <div className="text-center max-w-2xl px-4">
-                <p className="text-sm text-[#00f3ff] uppercase tracking-widest mb-4 font-semibold">{t.contactTag}</p>
-                <h2 className="text-5xl md:text-7xl font-bold mb-6 whitespace-pre-line">{t.contactTitle}</h2>
-                <p className="text-lg text-gray-400 font-light mb-12">
-                  {t.contactDesc}
-                </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
+            {/* 6. CONTACT & BUTTONS */}
+            <section className="h-screen flex flex-col items-center justify-center text-center px-4">
+               <div className="group cursor-pointer relative mb-12">
+                  <h2 className="text-5xl md:text-9xl font-bold tracking-tighter transition-all duration-700 group-hover:italic">
+                    {t.contact}
+                  </h2>
+                  <div className="absolute -inset-10 bg-[#00f3ff] blur-[120px] opacity-0 group-hover:opacity-20 transition-opacity" />
+               </div>
+               
+               {/* NEW: ACTION BUTTONS (CV & EMAIL) */}
+               <div className="flex flex-col sm:flex-row gap-6 mb-20 z-10">
                   <a href="mailto:eemredonmez41@gmail.com" 
-                     className="w-full sm:w-auto px-8 py-4 bg-[#00f3ff] text-black font-bold rounded-full hover:shadow-[0_0_30px_rgba(0,243,255,0.8)] transition-all">
+                     className="px-10 py-4 bg-[#00f3ff] text-black font-bold rounded-full hover:shadow-[0_0_30px_#00f3ff] transition-all hover:-translate-y-1">
                     {t.btnEmail}
                   </a>
                   <a href="/Emre_DonmezCV.pdf" download 
-                     className="w-full sm:w-auto px-8 py-4 border border-gray-500 text-white font-bold rounded-full hover:border-[#00f3ff] hover:text-[#00f3ff] transition-all">
+                     className="px-10 py-4 border border-white/20 text-white font-bold rounded-full hover:border-[#00f3ff] hover:text-[#00f3ff] transition-all hover:-translate-y-1">
                     {t.btnCv}
                   </a>
-                </div>
-                <div className="flex items-center justify-center gap-10">
-                  <a href="https://linkedin.com/in/emredönmez41" target="_blank" className="text-gray-400 hover:text-[#00f3ff] transition-colors">LinkedIn</a>
-                  <a href="https://github.com/Emrefire" target="_blank" className="text-gray-400 hover:text-[#00f3ff] transition-colors">GitHub</a>
-                </div>
-              </div>
-              <div className="absolute bottom-8 text-center w-full text-xs text-gray-600 tracking-widest uppercase">
-                © {new Date().getFullYear()} {t.rights}
-              </div>
-            </div>
+               </div>
+               
+               <div className="flex gap-10 text-xs tracking-[0.5em] text-gray-500">
+                  <a href="https://github.com/Emrefire" target="_blank" className="hover:text-white transition-colors">GITHUB</a>
+                  <a href="https://linkedin.com/in/emredönmez41" target="_blank" className="hover:text-white transition-colors">LINKEDIN</a>
+               </div>
+               <p className="absolute bottom-10 text-[10px] tracking-[1em] text-gray-700 uppercase">© 2026 {t.rights}</p>
+            </section>
 
           </Scroll>
         </ScrollControls>
       </Canvas>
+
+      <style jsx global>{`
+        ::-webkit-scrollbar { display: none; }
+        body { background: #020202; cursor: crosshair; }
+      `}</style>
     </div>
   );
 }
