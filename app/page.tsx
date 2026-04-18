@@ -9,7 +9,7 @@ import { Space_Grotesk, Playfair_Display } from 'next/font/google';
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], weight: ['300', '400', '600', '700'] });
 const playfair = Playfair_Display({ subsets: ['latin'], weight: ['600', '700'] });
 
-// --- ÇEVİRİ SÖZLÜĞÜ (DICTIONARY) ---
+// --- ÇEVİRİ SÖZLÜĞÜ (Aynen Korundu) ---
 const translations = {
   en: {
     heroPrefix: "I am a",
@@ -19,10 +19,10 @@ const translations = {
     appDesc: "A location-based mobile tracking application built with React Native. Features include real-time location calculations and a custom notification system.",
     btnSource: "View Source Code",
     aiTag: "02 — AI & Computer Vision",
-    aiDesc: "A TÜBİTAK 2209-B supported driver drowsiness tracking system. Integrates facial expression recognition models across Web and Mobile platforms.",
+    aiDesc: "A TÜBİTAK 2209-B supported driver drowsiness tracking system. Integrates facial expression recognition models across Web and Mobile platforms (Developed with Mustafa Aslan).",
     btnGithub: "Explore on GitHub",
     nextierTag: "03 — Artificial Intelligence",
-    nextierDesc: "A modern, scalable next-generation AI desktop solution leveraging LLM and Retrieval-Augmented Generation (RAG) architectures.",
+    nextierDesc: "A high-performance WinUI 3 desktop application featuring Local LLM integration via Ollama, providing a private and cost-effective AI experience.",
     btnProject: "View Project",
     careerTag: "04 — Career",
     careerTitle: "Experience",
@@ -46,10 +46,10 @@ const translations = {
     appDesc: "React Native ile geliştirilmiş, lokasyon bazlı anlık takip ve özel bildirim sistemine sahip canlı mobil uygulama.",
     btnSource: "Kaynak Kodu İncele",
     aiTag: "02 — Yapay Zeka & Görüntü İşleme",
-    aiDesc: "TÜBİTAK 2209-B destekli sürücü yorgunluk takip sistemi. Yüz ifadesi tanıma modellerinin Web ve Mobil platformlara entegrasyonu.",
+    aiDesc: "TÜBİTAK 2209-B destekli sürücü yorgunluk takip sistemi. Yüz ifadesi tanıma modellerinin Web ve Mobil platformlara entegrasyonu (Mustafa Aslan ile birlikte).",
     btnGithub: "GitHub'da İncele",
     nextierTag: "03 — Yapay Zeka",
-    nextierDesc: "LLM ve RAG mimarileri kullanılarak geliştirilmiş, modern ve ölçeklenebilir yeni nesil yapay zeka çözümü.",
+    nextierDesc: "Ollama üzerinden Yerel LLM entegrasyonuna sahip, veri gizliliği odaklı ve yüksek performanslı WinUI 3 masaüstü yapay zeka çözümü.",
     btnProject: "Projeye Git",
     careerTag: "04 — Kariyer",
     careerTitle: "Deneyim",
@@ -67,15 +67,13 @@ const translations = {
   }
 };
 
-// --- Daktilo (Silinip Yazılma) Efekti Bileşeni ---
+// --- Daktilo Efekti (Aynen Korundu) ---
 function Typewriter({ words }: { words: string[] }) {
   const [index, setIndex] = useState(0);
   const [text, setText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const colorRef = useRef<HTMLSpanElement>(null);
 
-  // Dil değiştiğinde daktiloyu sıfırla
   useEffect(() => {
     setText('');
     setIndex(0);
@@ -83,13 +81,8 @@ function Typewriter({ words }: { words: string[] }) {
   }, [words]);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
     let animationFrameId: number;
     const startTime = Date.now();
-
     const updateColor = () => {
       if (colorRef.current) {
         const elapsed = (Date.now() - startTime) / 1000;
@@ -98,14 +91,11 @@ function Typewriter({ words }: { words: string[] }) {
       }
       animationFrameId = requestAnimationFrame(updateColor);
     };
-
     updateColor();
     return () => cancelAnimationFrame(animationFrameId);
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
-
     const currentWord = words[index];
     if (!currentWord) return;
 
@@ -125,9 +115,7 @@ function Typewriter({ words }: { words: string[] }) {
     }, isDeleting ? 50 : 100);
 
     return () => clearTimeout(timeout);
-  }, [text, isDeleting, index, mounted, words]);
-
-  if (!mounted) return <span className="text-[#00f3ff]">{words[0]}<span className="animate-pulse">|</span></span>;
+  }, [text, isDeleting, index, words]);
 
   return (
     <span ref={colorRef} style={{ color: '#00f3ff', transition: 'color 0.1s linear' }}>
@@ -137,7 +125,7 @@ function Typewriter({ words }: { words: string[] }) {
   );
 }
 
-// --- Renk Değiştiren 3D Objemiz ---
+// --- 3D Obje ---
 function ColorChangingKnot() {
   const meshRef = useRef<THREE.Mesh>(null);
   const materialRef = useRef<THREE.MeshStandardMaterial>(null);
@@ -145,10 +133,8 @@ function ColorChangingKnot() {
 
   useFrame((state, delta) => {
     if (!meshRef.current) return;
-
     meshRef.current.rotation.x += delta * 0.2;
     meshRef.current.rotation.y += delta * 0.3;
-
     const offset = scroll.offset;
     meshRef.current.position.y = -offset * 25; 
     meshRef.current.rotation.z = offset * Math.PI * 3; 
@@ -174,15 +160,20 @@ function ColorChangingKnot() {
 }
 
 export default function Portfolio() {
-  // Dil state'ini oluşturuyoruz (Varsayılan: İngilizce)
   const [lang, setLang] = useState<'en' | 'tr'>('en');
-  // Seçili dile göre içerikleri alıyoruz
   const t = translations[lang];
+
+  // --- HATA ÇÖZÜCÜ: HYDRATION KONTROLÜ ---
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null; 
 
   return (
     <div className={`h-screen w-full bg-[#050505] text-white overflow-hidden ${spaceGrotesk.className}`}>
       
-      {/* --- YENİ: DİL DEĞİŞTİRME BUTONU --- */}
       <button 
         onClick={() => setLang(lang === 'en' ? 'tr' : 'en')}
         className="fixed top-6 right-6 md:top-10 md:right-10 z-50 px-4 py-2 border-2 border-[#00f3ff] text-[#00f3ff] hover:bg-[#00f3ff] hover:text-black transition-all duration-300 rounded-full font-bold tracking-widest text-sm shadow-[0_0_15px_rgba(0,243,255,0.3)] hover:shadow-[0_0_30px_rgba(0,243,255,0.8)] backdrop-blur-sm bg-black/30"
@@ -199,7 +190,7 @@ export default function Portfolio() {
           
           <Scroll html style={{ width: '100%' }}>
             
-            {/* Sayfa 1: Hero & About Section */}
+            {/* Sayfa 1: Hero */}
             <div className="h-screen flex flex-col items-center justify-center px-4 text-center">
               <h1 className={`text-7xl md:text-8xl font-bold tracking-tight mb-2 ${playfair.className}`}>
                 Emre Dönmez
@@ -223,7 +214,7 @@ export default function Portfolio() {
                 <p className="text-lg text-gray-300 font-light mb-8">
                   {t.appDesc}
                 </p>
-                <a href="https://github.com/Emrefire" target="_blank" rel="noopener noreferrer" 
+                <a href="https://github.com/Emrefire/Yoldas-App" target="_blank" rel="noopener noreferrer" 
                    className="inline-block px-8 py-3 border border-[#00f3ff] text-[#00f3ff] hover:bg-[#00f3ff] hover:text-black transition-all duration-300 rounded-full font-medium tracking-wide shadow-[0_0_15px_rgba(0,243,255,0.3)] hover:shadow-[0_0_30px_rgba(0,243,255,0.8)]">
                   {t.btnSource}
                 </a>
@@ -239,7 +230,7 @@ export default function Portfolio() {
                   {t.aiDesc}
                 </p>
                 <div className="flex justify-end">
-                  <a href="https://github.com/Emrefire" target="_blank" rel="noopener noreferrer" 
+                  <a href="https://github.com/Emrefire/ODAK-Driver-Drowsiness-Tracking" target="_blank" rel="noopener noreferrer" 
                      className="inline-block px-8 py-3 border border-[#00f3ff] text-[#00f3ff] hover:bg-[#00f3ff] hover:text-black transition-all duration-300 rounded-full font-medium tracking-wide shadow-[0_0_15px_rgba(0,243,255,0.3)] hover:shadow-[0_0_30px_rgba(0,243,255,0.8)]">
                     {t.btnGithub}
                   </a>
@@ -255,21 +246,19 @@ export default function Portfolio() {
                 <p className="text-lg text-gray-300 font-light mb-8">
                   {t.nextierDesc}
                 </p>
-                <a href="https://github.com/Emrefire" target="_blank" rel="noopener noreferrer" 
+                <a href="https://github.com/Emrefire/NextierAI" target="_blank" rel="noopener noreferrer" 
                    className="inline-block px-8 py-3 border border-[#00f3ff] text-[#00f3ff] hover:bg-[#00f3ff] hover:text-black transition-all duration-300 rounded-full font-medium tracking-wide shadow-[0_0_15px_rgba(0,243,255,0.3)] hover:shadow-[0_0_30px_rgba(0,243,255,0.8)]">
                   {t.btnProject}
                 </a>
               </div>
             </div>
 
-            {/* Sayfa 5: Experience & Tech Stack */}
+            {/* Sayfa 5: Experience */}
             <div className="h-screen flex items-center justify-center px-6 md:px-20">
               <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-16">
-                
                 <div>
                   <p className="text-sm text-[#00f3ff] uppercase tracking-widest mb-2 font-semibold">{t.careerTag}</p>
                   <h2 className="text-4xl md:text-5xl font-bold mb-8">{t.careerTitle}</h2>
-                  
                   <div className="border-l-2 border-[#00f3ff]/30 pl-6 relative">
                     <div className="absolute w-4 h-4 bg-[#050505] border-2 border-[#00f3ff] rounded-full -left-[9px] top-2 shadow-[0_0_10px_#00f3ff]"></div>
                     <h3 className="text-2xl font-bold text-white">{t.jobTitle}</h3>
@@ -284,35 +273,32 @@ export default function Portfolio() {
                 <div>
                   <p className="text-sm text-[#00f3ff] uppercase tracking-widest mb-2 font-semibold">{t.arsenalTag}</p>
                   <h2 className="text-4xl md:text-5xl font-bold mb-8">{t.techTitle}</h2>
-                  
                   <div className="space-y-6">
                     <div>
                       <h4 className="text-gray-400 mb-3 uppercase tracking-wider text-xs font-semibold">Backend & Architecture</h4>
                       <div className="flex flex-wrap gap-2">
                         {['.NET Core', 'ASP.NET MVC/API', 'Clean Architecture', 'CQRS', 'MediatR', 'JWT'].map(tech => (
-                          <span key={tech} className="px-4 py-1.5 text-sm border border-gray-700/50 rounded-full hover:border-[#00f3ff] hover:text-[#00f3ff] transition-all hover:shadow-[0_0_10px_rgba(0,243,255,0.2)] cursor-default bg-gray-900/30">
+                          <span key={tech} className="px-4 py-1.5 text-sm border border-gray-700/50 rounded-full hover:border-[#00f3ff] hover:text-[#00f3ff] transition-all hover:shadow-[0_0_10px_rgba(0,243,255,0.2)] bg-gray-900/30">
                             {tech}
                           </span>
                         ))}
                       </div>
                     </div>
-                    
                     <div>
                       <h4 className="text-gray-400 mb-3 uppercase tracking-wider text-xs font-semibold">Frontend & Mobile</h4>
                       <div className="flex flex-wrap gap-2">
                         {['React', 'Next.js', 'React Native', 'Tailwind CSS'].map(tech => (
-                          <span key={tech} className="px-4 py-1.5 text-sm border border-gray-700/50 rounded-full hover:border-[#00f3ff] hover:text-[#00f3ff] transition-all hover:shadow-[0_0_10px_rgba(0,243,255,0.2)] cursor-default bg-gray-900/30">
+                          <span key={tech} className="px-4 py-1.5 text-sm border border-gray-700/50 rounded-full hover:border-[#00f3ff] hover:text-[#00f3ff] transition-all hover:shadow-[0_0_10px_rgba(0,243,255,0.2)] bg-gray-900/30">
                             {tech}
                           </span>
                         ))}
                       </div>
                     </div>
-
                     <div>
                       <h4 className="text-gray-400 mb-3 uppercase tracking-wider text-xs font-semibold">Database & AI</h4>
                       <div className="flex flex-wrap gap-2">
                         {['SQL Server', 'Firebase', 'LLM', 'RAG', 'Computer Vision'].map(tech => (
-                          <span key={tech} className="px-4 py-1.5 text-sm border border-gray-700/50 rounded-full hover:border-[#00f3ff] hover:text-[#00f3ff] transition-all hover:shadow-[0_0_10px_rgba(0,243,255,0.2)] cursor-default bg-gray-900/30">
+                          <span key={tech} className="px-4 py-1.5 text-sm border border-gray-700/50 rounded-full hover:border-[#00f3ff] hover:text-[#00f3ff] transition-all hover:shadow-[0_0_10px_rgba(0,243,255,0.2)] bg-gray-900/30">
                             {tech}
                           </span>
                         ))}
@@ -320,11 +306,10 @@ export default function Portfolio() {
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
 
-            {/* Sayfa 6: Contact & Footer */}
+            {/* Sayfa 6: Contact */}
             <div className="h-screen flex flex-col items-center justify-center relative">
               <div className="text-center max-w-2xl px-4">
                 <p className="text-sm text-[#00f3ff] uppercase tracking-widest mb-4 font-semibold">{t.contactTag}</p>
@@ -332,28 +317,21 @@ export default function Portfolio() {
                 <p className="text-lg text-gray-400 font-light mb-12">
                   {t.contactDesc}
                 </p>
-                
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16">
                   <a href="mailto:eemredonmez41@gmail.com" 
-                     className="w-full sm:w-auto px-8 py-4 bg-[#00f3ff] text-black font-bold rounded-full hover:shadow-[0_0_30px_rgba(0,243,255,0.8)] transition-all hover:-translate-y-1">
+                     className="w-full sm:w-auto px-8 py-4 bg-[#00f3ff] text-black font-bold rounded-full hover:shadow-[0_0_30px_rgba(0,243,255,0.8)] transition-all">
                     {t.btnEmail}
                   </a>
                   <a href="/Emre_DonmezCV.pdf" download 
-                     className="w-full sm:w-auto px-8 py-4 border border-gray-500 text-white font-bold rounded-full hover:border-[#00f3ff] hover:text-[#00f3ff] hover:shadow-[0_0_15px_rgba(0,243,255,0.3)] transition-all hover:-translate-y-1">
+                     className="w-full sm:w-auto px-8 py-4 border border-gray-500 text-white font-bold rounded-full hover:border-[#00f3ff] hover:text-[#00f3ff] transition-all">
                     {t.btnCv}
                   </a>
                 </div>
-
                 <div className="flex items-center justify-center gap-10">
-                  <a href="https://linkedin.com/in/emredönmez41" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#00f3ff] transition-colors text-lg font-medium tracking-wide">
-                    LinkedIn
-                  </a>
-                  <a href="https://github.com/Emrefire" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#00f3ff] transition-colors text-lg font-medium tracking-wide">
-                    GitHub
-                  </a>
+                  <a href="https://linkedin.com/in/emredönmez41" target="_blank" className="text-gray-400 hover:text-[#00f3ff] transition-colors">LinkedIn</a>
+                  <a href="https://github.com/Emrefire" target="_blank" className="text-gray-400 hover:text-[#00f3ff] transition-colors">GitHub</a>
                 </div>
               </div>
-              
               <div className="absolute bottom-8 text-center w-full text-xs text-gray-600 tracking-widest uppercase">
                 © {new Date().getFullYear()} {t.rights}
               </div>
