@@ -18,7 +18,7 @@ const translations = {
     about: "Passionate about building scalable systems and integrating AI into real-world applications. I believe in clean code, robust architecture, and technology that makes a tangible impact.",
     projects: [
       { name: "Yoldaş", tag: "MOBILE AI", desc: "Location-based intelligence for modern life.", link: "https://github.com/Emrefire/Yoldas-App" },
-      { name: "ODAK", tag: "COMPUTER VISION", desc: "TÜBİTAK 2209-B: Saving lives with facial recognition.", link: "https://github.com/Emrefire/ODAK-Driver-Drowsiness-Tracking" },
+      { name: "ODAK", tag: "COMPUTER VISION", desc: "TÜBİTAK 2209-A: Saving lives with facial recognition.", link: "https://github.com/Emrefire/ODAK-Driver-Drowsiness-Tracking" },
       { name: "NexTierAI", tag: "LLM & RAG", desc: "Your private local AI infrastructure.", link: "https://github.com/Emrefire/NextierAI" }
     ],
     experience: {
