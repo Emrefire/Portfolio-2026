@@ -40,7 +40,7 @@ const translations = {
     about: "Ölçeklenebilir sistemler kurma ve yapay zekayı gerçek dünya uygulamalarına entegre etme konusunda tutkuluyum. Temiz koda ve sağlam mimariye inanıyorum.",
     projects: [
       { name: "Yoldaş", tag: "MOBİL YZ", desc: "Modern yaşam için lokasyon bazlı zeka.", link: "https://github.com/Emrefire/Yoldas-App" },
-      { name: "ODAK", tag: "GÖRÜNTÜ İŞLEME", desc: "TÜBİTAK 2209-B: Yüz tanıma ile hayat kurtaran sistem.", link: "https://github.com/Emrefire/ODAK-Driver-Drowsiness-Tracking" },
+      { name: "ODAK", tag: "GÖRÜNTÜ İŞLEME", desc: "TÜBİTAK 2209-A: Yüz tanıma ile hayat kurtaran sistem.", link: "https://github.com/Emrefire/ODAK-Driver-Drowsiness-Tracking" },
       { name: "NexTierAI", tag: "LLM & RAG", desc: "Kişisel yerel yapay zeka altyapınız.", link: "https://github.com/Emrefire/NextierAI" }
     ],
     experience: {
